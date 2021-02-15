@@ -8,8 +8,11 @@
 
 #include "input.h"
 
-#define SCREEN_WIDTH 83 // Default width of windows terminal when taking up half of screen
-#define SCREEN_HEIGHT 37//40 // Default height is 42. So setting this height 40 leaves us two extra rows to print fps and other info
+#define SCREEN_WIDTH 83 // Default width of windows terminal when taking up half 
+                        // of screen
+#define SCREEN_HEIGHT 37//40 // Default height is 42. So setting this height 40 
+                             // leaves us two extra rows to print fps and other 
+                             // info
 
 #define MAP_WIDTH 20  // Number of columns in map (width)
 #define MAP_HEIGHT 20 // Number of rows in map (height)
@@ -18,8 +21,8 @@
 #define PI 3.14159
 #define FOV (PI / 4) // Field of view angle
 
-float playerX = 4.0f; // Player x position/coordinate
-float playerY = 4.0f; // Player y position/coordinate
+float playerX = 6.0f; // Player x position/coordinate
+float playerY = 6.0f; // Player y position/coordinate
 float playerA = 0.0f; // Player angle of direction its looking at
 
 // Raycast Distance Resolution, float number. 
@@ -64,9 +67,10 @@ int main()
     // Matrix where we store the characters in how they will be rendered onto the screen
     char screen[SCREEN_WIDTH * SCREEN_HEIGHT];
 
-    // Setup to testout the 'input' module
     init_input();
-    while(1)
+
+    // Setup to testout the 'input' module
+    /*while(1)
     {
         if (kbhit())
         {
@@ -75,7 +79,7 @@ int main()
             //printf("Key pressed = %c\n", key);
             printw("Key pressed = %c (%d)\n", key, key);
         }
-    }
+    }*/
     // END OF Setup to testoud the 'input' module
 
     clock_t prevClock = clock();
@@ -83,6 +87,20 @@ int main()
     // Game loop
     while (1)
     {
+        // Handle input
+        if (kbhit())
+        {
+            char key = getch();
+            if (key == 'a')
+            {
+                playerA -= 0.04f;
+            }
+            else if (key == 'd')
+            {
+                playerA += 0.04f;
+            }
+        }
+
         for (int x = 0; x < SCREEN_WIDTH; ++x)
         {
             // For each column, making up the screen, calculate the projected ray angle into world space
@@ -165,19 +183,20 @@ int main()
         }
 
         screen[SCREEN_WIDTH*SCREEN_HEIGHT - 1] = '\0';
-        //printf("\033[0;0f"); // \033[L;Cf (puts console cursor at line L and column C)
-        //printf("%s", screen);
+        move(0,0);
+        printw("%s\n", screen);
 
         static unsigned long frameCounter = 0;
         clock_t clock_diff = clock() - prevClock;
-        printf("\nclock_diff = %ld, clocksPerSec = %ld\n", clock_diff, CLOCKS_PER_SEC);
+        printw("\nclock_diff = %ld, clocksPerSec = %ld\n", clock_diff, CLOCKS_PER_SEC);
         double time_diff_sec = (double)clock_diff / CLOCKS_PER_SEC;
         long fps = 1.0f / time_diff_sec;
-        printf("FPS = %ld TimeDiff: %f seconds, frameCounter = %lu", fps, time_diff_sec, frameCounter);
+        printw("FPS = %ld TimeDiff: %f seconds, frameCounter = %lu", fps, time_diff_sec, frameCounter);
         prevClock = clock();
         frameCounter++;
+        refresh(); // Without this printw will not be outputted before
 
-        std::chrono::milliseconds timespan(100); // or whatever
-        std::this_thread::sleep_for(timespan);
+        //std::chrono::milliseconds timespan(1000); // or whatever
+        //std::this_thread::sleep_for(timespan);
     } // End of Game loop ( while(1) )
 }

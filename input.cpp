@@ -12,10 +12,9 @@ void init_input(void)
     initscr();
 
     cbreak();
-    noecho();
+    noecho(); // noecho means, Don't print character when its typed
     nodelay(stdscr, TRUE);
-
-    scrollok(stdscr, TRUE);
+    scrollok(stdscr, FALSE); // scrollok(.., FALSE) means, Dont't scroll screen if cursor moves past the last line. (According to what I've read online, on man pages I think..)
 
     initInputHasBeenCalled = true;
 }
