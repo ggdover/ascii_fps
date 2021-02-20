@@ -8,11 +8,13 @@
 
 #include "input.h"
 
-#define SCREEN_WIDTH 83 // Default width of windows terminal when taking up half 
-                        // of screen
-#define SCREEN_HEIGHT 37//40 // Default height is 42. So setting this height 40 
-                             // leaves us two extra rows to print fps and other 
-                             // info
+#include <cassert>
+
+#define SCREEN_WIDTH 83 // Default width of windows terminal (wsl) when
+                        // taking up half of screen
+#define SCREEN_HEIGHT 40 // Default height is 42. So setting this height 40
+                         // leaves us two extra rows to print fps and other
+                         // info
 
 #define MAP_WIDTH 20  // Number of columns in map (width)
 #define MAP_HEIGHT 20 // Number of rows in map (height)
@@ -34,7 +36,7 @@ float playerA = 0.0f; // Player angle of direction its looking at
 #define RAYCAST_DIST_RES 0.05
 
 // Max field depth. Maximum distance player can see, value has 1:1 ratio to map tile
-#define MAX_DEPTH 14
+#define MAX_DEPTH 20
 
 int main()
 {
@@ -65,22 +67,9 @@ int main()
     printf("\033c"); // Clear screen
 
     // Matrix where we store the characters in how they will be rendered onto the screen
-    char screen[SCREEN_WIDTH * SCREEN_HEIGHT];
+    std::string screen(SCREEN_WIDTH * SCREEN_HEIGHT, ' ');
 
     init_input();
-
-    // Setup to testout the 'input' module
-    /*while(1)
-    {
-        if (kbhit())
-        {
-            char key = getch();
-            //prnt("Key pressed = %c %d\n", key, key);
-            //printf("Key pressed = %c\n", key);
-            printw("Key pressed = %c (%d)\n", key, key);
-        }
-    }*/
-    // END OF Setup to testoud the 'input' module
 
     clock_t prevClock = clock();
 
@@ -91,13 +80,33 @@ int main()
         if (kbhit())
         {
             char key = getch();
-            if (key == 'a')
+            if (key == 'k') // rotate ccw
             {
                 playerA -= 0.04f;
             }
-            else if (key == 'd')
+            else if (key == 'l') // rotate cw
             {
                 playerA += 0.04f;
+            }
+            else if (key == 'w') // move forwards
+            {
+                playerX += sinf(playerA);
+                playerY += cosf(playerA);
+            }
+            else if (key == 's') // move backwards
+            {
+                playerX -= sinf(playerA);
+                playerY -= cosf(playerA);
+            }
+            else if (key == 'a') // strafe left
+            {
+                playerX += sinf(playerA - 1.57); // pi/2 (90 degrees) = 1.57
+                playerY += cosf(playerA - 1.57);
+            }
+            else if (key == 'd') // strafe right
+            {
+                playerX += sinf(playerA + 1.57);
+                playerY += cosf(playerA + 1.57);
             }
         }
 
@@ -154,6 +163,10 @@ int main()
             int ceiling = (float)(SCREEN_HEIGHT / 2.0) - SCREEN_HEIGHT / ((float) distanceToWall);
             int floor = SCREEN_HEIGHT - ceiling;
 
+            // Character that will be rendered, will differ to represent
+            // different shade depending on distance/depth of vision.
+            char shade = ' ';
+
             // Iterating from bottom to top, all squares in the column we are currently rendering
             for (int y = 0; y < SCREEN_HEIGHT; ++y)
             {
@@ -164,13 +177,36 @@ int main()
                 }
                 else if (y > ceiling && y <= floor)
                 {
+                    // Get shade based on current distance
+                    // 1. Get precentage of how far the distance is
+                    //    1.0f (100%) means that distance is MAX_DEPTH
+                    //    (The max of what we can see
+                    float sight_distance = distanceToWall / MAX_DEPTH;
+                    // 2. Figure out which level of shade based on the precentage
+                    std::string shades = "@%#*=- "; // Characters that make up the total grayscale of shade.
+                                                    // Goes from brightest to darkest, or to be more exact, from shade
+                                                    // at closest distance to wall to shade at longest or infinite distance to wall.
+
+                    assert(shades.length() > 0); // Otherwise, shade_index on next line could be negative
+                    int shade_index = sight_distance * (shades.length() - 1);
+                    shade = shades[shade_index];
+
                     // This pixel is part of the wall (neither ceiling or floor)
-                    screen[y * SCREEN_WIDTH + x] = '#';
+                    screen[y * SCREEN_WIDTH + x] = shade;
                 }
                 else
                 {
                     // This pixel is part of the floor
-                    screen[y * SCREEN_WIDTH + x] = ' ';
+
+                    // I don't understand this code fully yet, just copied from the youtube video I follow
+                    // Will add explanation of this code in the future (unless I get lazy..)
+                    float b = 1.0f - (((float)y - SCREEN_HEIGHT / 2.0f) / ((float)SCREEN_HEIGHT / 2.0f));
+                    if (b < 0.4)
+                        shade = '+';
+                    else
+                        shade = '.';
+
+                    screen[y * SCREEN_WIDTH + x] = shade;
                 }
             }
         }
@@ -181,10 +217,10 @@ int main()
             int last_pixel = i * (SCREEN_WIDTH) + (SCREEN_WIDTH-1); // Get last pixel/char of row
             screen[last_pixel] = '\n';
         }
-
         screen[SCREEN_WIDTH*SCREEN_HEIGHT - 1] = '\0';
+
         move(0,0);
-        printw("%s\n", screen);
+        printw("%s\n", screen.c_str());
 
         static unsigned long frameCounter = 0;
         clock_t clock_diff = clock() - prevClock;
