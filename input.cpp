@@ -1,7 +1,5 @@
 // Taken from: https://stackoverflow.com/questions/4025891/create-a-function-to-check-for-key-press-in-unix-using-ncurses
 
-//#include <ncurses.h>
-//#include <unistd.h>  /* only for sleep() */
 #include <cstdlib>
 #include "input.h"
 

@@ -2,4 +2,4 @@
 
 # -g, makes sure debug symbols are included when building
 build:
-	g++ -g main.cpp input.cpp input.h -lncurses
+	g++ -g main.cpp input.cpp input.h rendering.cpp rendering.h constants.h -lncurses
