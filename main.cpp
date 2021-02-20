@@ -92,21 +92,53 @@ int main()
             {
                 playerX += sinf(playerA);
                 playerY += cosf(playerA);
+
+                // Collision detection
+                if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
+                {
+                    // New position puts us inside a wall. Rollback the move we just did
+                    playerX -= sinf(playerA);
+                    playerY -= cosf(playerA);
+                }
             }
             else if (key == 's') // move backwards
             {
                 playerX -= sinf(playerA);
                 playerY -= cosf(playerA);
+
+                // Collision detection
+                if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
+                {
+                    // New position puts us inside a wall. Rollback the move we just did
+                    playerX += sinf(playerA);
+                    playerY += cosf(playerA);
+                }
             }
             else if (key == 'a') // strafe left
             {
                 playerX += sinf(playerA - 1.57); // pi/2 (90 degrees) = 1.57
                 playerY += cosf(playerA - 1.57);
+
+                // Collision detection
+                if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
+                {
+                    // New position puts us inside a wall. Rollback the move we just did
+                    playerX -= sinf(playerA - 1.57);
+                    playerY -= cosf(playerA - 1.57);
+                }
             }
             else if (key == 'd') // strafe right
             {
                 playerX += sinf(playerA + 1.57);
                 playerY += cosf(playerA + 1.57);
+
+                // Collision detection
+                if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
+                {
+                    // New position puts us inside a wall. Rollback the move we just did
+                    playerX -= sinf(playerA + 1.57);
+                    playerY -= cosf(playerA + 1.57);
+                }
             }
         }
 
