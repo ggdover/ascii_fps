@@ -10,6 +10,12 @@ Stuff that cand be improved/added moving forward
   - Also update the README.md with this information so people who wants
     to run it and try are aware of this.
 
+* Add some information on how to build and run it yourself
+  - Also include information that the rendering will looked
+    messed up if terminal window is not big enough to hold
+    the size that is set on constants SCREEN_WIDTH and SCREEN_HEIGHT
+    in the application.
+
 * Fix so terminal colors is always restored after exiting.
 
 * Improve the input handling so we don't have any delay before
