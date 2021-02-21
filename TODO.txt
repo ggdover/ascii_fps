@@ -1,0 +1,24 @@
+Stuff that cand be improved/added moving forward
+
+* Add so SCREEN_WIDTH and SCREEN_HEIGHT can be set by sending
+  as arguments when executing binary.
+  Would be really cool if user could do something like:
+  './ascii_fps | stty size' or './ascii_fps < stty size'
+  to have it set SCREEN_WIDTH and SCREEN_HEIGHT to what will create
+  a perfect fit for the current size (width/height) and font/character
+  size on the terminal.
+  - Also update the README.md with this information so people who wants
+    to run it and try are aware of this.
+
+* Fix so terminal colors is always restored after exiting.
+
+* Improve the input handling so we don't have any delay before
+  repeat output starts.
+  - You notice this when you press and hold a key, the first
+    character will come immediatley, but then there is a short
+    delay before the same character is repeated as long as the
+    key is held down.
+    This is disruptive compared to the responsive input handling
+    that one would expect when you are trying to move a character
+    in a fps game.
+
