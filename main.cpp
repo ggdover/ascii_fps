@@ -10,9 +10,10 @@
 #include "rendering.h"
 
 #include <cassert>
+#include <algorithm> // max
 
-float playerX = 6.0f; // Player x position/coordinate
-float playerY = 6.0f; // Player y position/coordinate
+float playerX = 2.0f; // Player x position/coordinate
+float playerY = 8.0f; // Player y position/coordinate
 float playerA = 0.0f; // Player angle of direction its looking at
 
 int main()
@@ -23,17 +24,17 @@ int main()
     map += "####################";
     map += "#..................#";
     map += "#..................#";
+    map += "####...............#";
+    map += "#..................#";
+    map += "#............#.....#";
+    map += "#............#######";
     map += "#..................#";
     map += "#..................#";
     map += "#..................#";
     map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
+    map += "#..........####....#";
+    map += "#..........####....#";
+    map += "#..........####....#";
     map += "#..................#";
     map += "#..................#";
     map += "#..................#";
@@ -46,7 +47,12 @@ int main()
     // Matrix where we store the characters in how they will be rendered onto the screen
     std::string screen(SCREEN_WIDTH * SCREEN_HEIGHT, ' ');
 
+    // True = Colorized rendering/output
+    // False = Pure ascii (white text on black background) rendering/output
+    bool colored_output = true;
+
     init_input();
+    init_colors();
 
     clock_t prevClock = clock();
 
@@ -59,11 +65,11 @@ int main()
             char key = getch();
             if (key == 'k') // rotate ccw
             {
-                playerA -= 0.04f;
+                playerA -= 0.08f;
             }
             else if (key == 'l') // rotate cw
             {
-                playerA += 0.04f;
+                playerA += 0.08f;
             }
             else if (key == 'w') // move forwards
             {
@@ -117,8 +123,24 @@ int main()
                     playerY -= cosf(playerA + 1.57);
                 }
             }
+            else if (key == 'v') // Switch visual mode (toggle between ascii and colorized drawing)
+            {
+                colored_output = !colored_output;
+                attrset(A_NORMAL); // Override previous attributes set, and set to normal
+                                   // if switching is to ascii rendering
+                                   // (attron doesn,'t override previous, attrset does though)
+            }
         }
 
+        // Should only be called once per frame (as suppose to once per column or row)
+        // Needs also to be called before rendering wall, as wall should paint over
+        // the ceiling and floor.
+        if (colored_output)
+        {
+            colored_draw_ceiling_and_floor();
+        }
+
+        // Iterate through all screen columns
         for (int x = 0; x < SCREEN_WIDTH; ++x)
         {
             // For each column, making up the screen, calculate the projected ray angle into world space
@@ -169,25 +191,41 @@ int main()
             // we can think the height of the wall as it appears shrinks closer and closer
             // to the middle as we move further away, so it shrinks in how it appears equally
             // from the floor as it does from the ceiling.
-            int ceiling = (float)(SCREEN_HEIGHT / 2.0) - SCREEN_HEIGHT / ((float) distanceToWall);
+            int ceiling = std::max( (float)(SCREEN_HEIGHT / 2.0) - SCREEN_HEIGHT / ((float) distanceToWall), 0.0f );
             int floor = SCREEN_HEIGHT - ceiling;
 
-            ascii_shade_column(x, ceiling, floor, distanceToWall, screen);
+            if (colored_output)
+            {
+                colored_draw_wall_column(x, ceiling, floor, distanceToWall);
+            }
+            else
+            {
+                ascii_shade_column(x, ceiling, floor, distanceToWall, screen);
+            }
         }
 
-        ascii_draw(screen);
+        if (colored_output)
+        {
+            // So the next printout, fps printout etc., happens on the correct line
+            move(SCREEN_HEIGHT, 0);
+            // Make sure next printout doesn't have any of the background or foreground color applied
+            attrset(A_NORMAL);
+        }
+        else
+        {
+            ascii_draw(screen);
+        }
 
         static unsigned long frameCounter = 0;
         clock_t clock_diff = clock() - prevClock;
         printw("\nclock_diff = %ld, clocksPerSec = %ld\n", clock_diff, CLOCKS_PER_SEC);
         double time_diff_sec = (double)clock_diff / CLOCKS_PER_SEC;
         long fps = 1.0f / time_diff_sec;
-        printw("FPS = %ld TimeDiff: %f seconds, frameCounter = %lu", fps, time_diff_sec, frameCounter);
+        printw("FPS = %ld TimeDiff: %f seconds, frameCounter = %lu\n", fps, time_diff_sec, frameCounter);
         prevClock = clock();
         frameCounter++;
+        printw("player pos (x,y) = %.3f,%.3f playerA = %.3f", playerX, playerY, playerA);
         refresh(); // Without this printw will not be outputted before
 
-        //std::chrono::milliseconds timespan(1000); // or whatever
-        //std::this_thread::sleep_for(timespan);
     } // End of Game loop ( while(1) )
 }
