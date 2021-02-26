@@ -1,5 +1,5 @@
 #include "rendering.h"
-#include "constants.h"
+#include "globals.h"
 #include <cassert> // assert
 #include <ncurses.h> // move, printw
 #include <vector> // vector
@@ -21,12 +21,12 @@ void ascii_shade_column(int x, int ceiling, int floor, float distanceToWall, std
     char shade = ' ';
 
     // Iterating top to bottom, all squares in the column we are currently rendering
-    for (int y = 0; y < SCREEN_HEIGHT; ++y)
+    for (int y = 0; y < screen_height; ++y)
     {
         if (y < ceiling)
         {
             // This pixel is part of the ceiling
-            screen[y * SCREEN_WIDTH + x] = ' ';
+            screen[y * screen_width + x] = ' ';
         }
         else if (y > ceiling && y <= floor)
         {
@@ -45,7 +45,7 @@ void ascii_shade_column(int x, int ceiling, int floor, float distanceToWall, std
             shade = shades[shade_index];
 
             // This pixel is part of the wall (neither ceiling or floor)
-            screen[y * SCREEN_WIDTH + x] = shade;
+            screen[y * screen_width + x] = shade;
         }
         else
         {
@@ -53,13 +53,13 @@ void ascii_shade_column(int x, int ceiling, int floor, float distanceToWall, std
 
             // precentage of how far down on screen our current y-coordinate is.
             // 1.0f means its in the very middle of screen, 0.0f means its at the very bottom.
-            float b = 1.0f - (((float)y - SCREEN_HEIGHT / 2.0f) / ((float)SCREEN_HEIGHT / 2.0f));
+            float b = 1.0f - (((float)y - screen_height / 2.0f) / ((float)screen_height / 2.0f));
             if (b < 0.4)
                 shade = '+';
             else
                 shade = '.';
 
-            screen[y * SCREEN_WIDTH + x] = shade;
+            screen[y * screen_width + x] = shade;
         }
     }
 }
@@ -71,9 +71,9 @@ void ascii_shade_column(int x, int ceiling, int floor, float distanceToWall, std
 void ascii_draw(std::string &screen)
 {
     // Sacrifice the right most column for newlines
-    for (int i = 0; i < SCREEN_HEIGHT; ++i)
+    for (int i = 0; i < screen_height; ++i)
     {
-        int last_pixel = i * (SCREEN_WIDTH) + (SCREEN_WIDTH-1); // Get last pixel/char of row
+        int last_pixel = i * (screen_width) + (screen_width-1); // Get last pixel/char of row
         screen[last_pixel] = '\n';
     }
 
@@ -260,60 +260,60 @@ void colored_draw_wall_column(int x, int ceiling, int floor, float distanceToWal
 
 void colored_draw_ceiling_and_floor()
 {
-    for (int y = 0; y < SCREEN_HEIGHT; ++y)
+    for (int y = 0; y < screen_height; ++y)
     {
         // Precentage value of where the current pixel is
         // ( This is to make sure where shadings start/end
-        //   scales in accordance to change in SCREEN_WIDTH/HEIGHT
+        //   scales in accordance to change in screen_width/height
         // - 0.0f means top of screen, 1.0f means bottom of screen
-        float y_prec = y / (float)SCREEN_HEIGHT;
+        float y_prec = y / (float)screen_height;
 
         if (y_prec < 0.02f || y_prec > 0.98f)
         {
             attron(COLOR_PAIR(30));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(30));
         }
         else if (y_prec < 0.05f || y_prec > 0.95f)
         {
             attron(COLOR_PAIR(31));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(31));
         }
         else if (y_prec < 0.08f || y_prec > 0.92f)
         {
             attron(COLOR_PAIR(32));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(32));
         }
         else if (y_prec < 0.13f || y_prec > 0.87f)
         {
             attron(COLOR_PAIR(33));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(33));
         }
         else if (y_prec < 0.16f || y_prec > 0.84f)
         {
             attron(COLOR_PAIR(34));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(34));
         }
         else if (y_prec < 0.20f || y_prec > 0.80f)
         {
             attron(COLOR_PAIR(35));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(35));
         }
         else if (y_prec < 0.25f || y_prec > 0.75f)
         {
             attron(COLOR_PAIR(36));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(36));
         }
         else
         {
             attron(COLOR_PAIR(37));
-            mvhline(y, 0, ' ', SCREEN_WIDTH);
+            mvhline(y, 0, ' ', screen_width);
             attron(COLOR_PAIR(37));
         }
     }

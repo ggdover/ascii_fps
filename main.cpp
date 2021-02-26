@@ -1,23 +1,57 @@
-#include <string>
+#include <string> // stoi, string
 #include <cmath>
 #include <ctime>
 
 #include <chrono>
 #include <thread>
 
-#include "constants.h"
+#include "globals.h"
 #include "input.h"
 #include "rendering.h"
 
 #include <cassert>
 #include <algorithm> // max
+#include <iostream> // cin
+#include <vector>
+#include <unistd.h> // isatty
 
 float playerX = 2.0f; // Player x position/coordinate
 float playerY = 8.0f; // Player y position/coordinate
 float playerA = 0.0f; // Player angle of direction its looking at
 
-int main()
+// Definition of extern variables from "globals.h"
+int screen_width;
+int screen_height;
+
+int main(int argc,char* argv[])
 {
+    printf("\033c"); // Clear screen
+
+    // Try parsing command line arguments screen height and width
+    try
+    {
+        if (argc >= 3)
+        {
+            screen_height = (std::stoi(argv[1]) - 3); // Minus 3 to make space for the prinout of fps, player position etc.
+            screen_width = std::stoi(argv[2]);
+        }
+        else
+        {
+            throw std::out_of_range("Out of range on argv");
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Could not find and parse command line args for screen height and width.\nGoing with default values.\n");
+        screen_height = DEFAULT_SCREEN_HEIGHT;
+        screen_width = DEFAULT_SCREEN_WIDTH;
+    }
+    printf("Screen Width = %d Height = %d\n", screen_width, screen_height);
+    printf("Used WASD to move forward/backward and strafe left/right. Use K and L to rotate.\n");
+    printf("Press Enter to continue...\n");
+    sleep(1);
+    std::cin.ignore();
+
     std::string map;
     // # = wall/obastacle
     // . = space
@@ -45,7 +79,7 @@ int main()
     printf("\033c"); // Clear screen
 
     // Matrix where we store the characters in how they will be rendered onto the screen
-    std::string screen(SCREEN_WIDTH * SCREEN_HEIGHT, ' ');
+    std::string screen(screen_width * screen_height, ' ');
 
     // True = Colorized rendering/output
     // False = Pure ascii (white text on black background) rendering/output
@@ -141,14 +175,14 @@ int main()
         }
 
         // Iterate through all screen columns
-        for (int x = 0; x < SCREEN_WIDTH; ++x)
+        for (int x = 0; x < screen_width; ++x)
         {
             // For each column, making up the screen, calculate the projected ray angle into world space
             // ---- CALCULATION EXPLAINED: ----
             // (playerA - FOV / 2.0f) = The left edge of our field-of-view (what we see)
-            // (float)x / (float)SCREEN_WIDTH) * FOV = If x = 1 this is how much degree of angle for each column we see infront of us,
+            // (float)x / (float)screen_width) * FOV = If x = 1 this is how much degree of angle for each column we see infront of us,
             //                                   So this adds the amount of degrees of angle to find our column
-            float rayAngle = (playerA - FOV / 2.0f) + ((float)x / (float)SCREEN_WIDTH) * FOV;
+            float rayAngle = (playerA - FOV / 2.0f) + ((float)x / (float)screen_width) * FOV;
 
             // Progressively step forward in direction of current 
             // 'rayAngle' until we hit a wall to figure out the distance.
@@ -191,8 +225,8 @@ int main()
             // we can think the height of the wall as it appears shrinks closer and closer
             // to the middle as we move further away, so it shrinks in how it appears equally
             // from the floor as it does from the ceiling.
-            int ceiling = std::max( (float)(SCREEN_HEIGHT / 2.0) - SCREEN_HEIGHT / ((float) distanceToWall), 0.0f );
-            int floor = SCREEN_HEIGHT - ceiling;
+            int ceiling = std::max( (float)(screen_height / 2.0) - screen_height / ((float) distanceToWall), 0.0f );
+            int floor = screen_height - ceiling;
 
             if (colored_output)
             {
@@ -207,7 +241,7 @@ int main()
         if (colored_output)
         {
             // So the next printout, fps printout etc., happens on the correct line
-            move(SCREEN_HEIGHT, 0);
+            move(screen_height, 0);
             // Make sure next printout doesn't have any of the background or foreground color applied
             attrset(A_NORMAL);
         }

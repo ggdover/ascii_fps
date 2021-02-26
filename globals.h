@@ -1,9 +1,16 @@
+// globals.h - Holds Constants and variables to be available globally in the whole code base.
 
-#define SCREEN_WIDTH 83 // Default width of windows terminal (wsl) when
-                        // taking up half of screen
-#define SCREEN_HEIGHT 40 // Default height is 42. So setting this height 40
-                         // leaves us two extra rows to print fps and other
-                         // info
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+// If screen width and height is not provided
+// to program by command line arguments, these
+// are the values screen width and height is set to.
+#define DEFAULT_SCREEN_WIDTH 83 // Default width of windows terminal (wsl) when
+                                // taking up half of screen
+#define DEFAULT_SCREEN_HEIGHT 40 // Default height is 42. So setting this height 40
+                                 // leaves us two extra rows to print fps and other
+                                 // info
 
 #define MAP_WIDTH 20  // Number of columns in map (width)
 #define MAP_HEIGHT 20 // Number of rows in map (height)
@@ -22,3 +29,10 @@
 
 // Max field depth. Maximum distance player can see, value has 1:1 ratio to map tile
 #define MAX_DEPTH 20
+
+// The official screen width and height.
+// The values represents number of characters in width and height.
+extern int screen_width;
+extern int screen_height;
+
+#endif
