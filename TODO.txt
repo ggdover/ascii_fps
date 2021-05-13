@@ -1,15 +1,5 @@
 Stuff that cand be improved/added moving forward
 
-* Add so SCREEN_WIDTH and SCREEN_HEIGHT can be set by sending
-  as arguments when executing binary.
-  Would be really cool if user could do something like:
-  './ascii_fps | stty size' or './ascii_fps < stty size'
-  to have it set SCREEN_WIDTH and SCREEN_HEIGHT to what will create
-  a perfect fit for the current size (width/height) and font/character
-  size on the terminal.
-  - Also update the README.md with this information so people who wants
-    to run it and try are aware of this.
-
 * Add some information on how to build and run it yourself
   - Also include information that the rendering will looked
     messed up if terminal window is not big enough to hold
