@@ -15,9 +15,9 @@
 #include <vector>
 #include <unistd.h> // isatty
 
-float playerX = 2.0f; // Player x position/coordinate
-float playerY = 8.0f; // Player y position/coordinate
-float playerA = 0.0f; // Player angle of direction its looking at
+float playerX = 1.5f; // Player x position/coordinate
+float playerY = 1.5f; // Player y position/coordinate
+float playerA = 1.5f; // Player angle of direction its looking at
 
 // Definition of extern variables from "globals.h"
 int screen_width;
@@ -58,20 +58,20 @@ int main(int argc,char* argv[])
     map += "####################";
     map += "#..................#";
     map += "#..................#";
-    map += "####...............#";
-    map += "#..................#";
-    map += "#............#.....#";
-    map += "#............#######";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..................#";
-    map += "#..........####....#";
-    map += "#..........####....#";
-    map += "#..........####....#";
+    map += "######...#######...#";
+    map += "######...#######...#";
+    map += "######...#######...#";
+    map += "######...###########";
     map += "#..................#";
     map += "#..................#";
     map += "#..................#";
+    map += "#..................#";
+    map += "#####...#########..#";
+    map += "#..##...####..###..#";
+    map += "#..#########..###..#";
+    map += "#..................#";
+    map += "#..................#";
+    map += "#################..#";
     map += "#..................#";
     map += "#..................#";
     map += "####################";
@@ -84,6 +84,9 @@ int main(int argc,char* argv[])
     // True = Colorized rendering/output
     // False = Pure ascii (white text on black background) rendering/output
     bool colored_output = true;
+    // True = Display map
+    // False = Don't display map
+    bool display_map = false;
 
     init_input();
     init_colors();
@@ -107,54 +110,54 @@ int main(int argc,char* argv[])
             }
             else if (key == 'w') // move forwards
             {
-                playerX += sinf(playerA);
-                playerY += cosf(playerA);
+                playerX += sinf(playerA) * 0.5;
+                playerY += cosf(playerA) * 0.5;
 
                 // Collision detection
                 if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
                 {
                     // New position puts us inside a wall. Rollback the move we just did
-                    playerX -= sinf(playerA);
-                    playerY -= cosf(playerA);
+                    playerX -= sinf(playerA) * 0.5;
+                    playerY -= cosf(playerA) * 0.5;
                 }
             }
             else if (key == 's') // move backwards
             {
-                playerX -= sinf(playerA);
-                playerY -= cosf(playerA);
+                playerX -= sinf(playerA) * 0.5;
+                playerY -= cosf(playerA) * 0.5;
 
                 // Collision detection
                 if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
                 {
                     // New position puts us inside a wall. Rollback the move we just did
-                    playerX += sinf(playerA);
-                    playerY += cosf(playerA);
+                    playerX += sinf(playerA) * 0.5;
+                    playerY += cosf(playerA) * 0.5;
                 }
             }
             else if (key == 'a') // strafe left
             {
-                playerX += sinf(playerA - 1.57); // pi/2 (90 degrees) = 1.57
-                playerY += cosf(playerA - 1.57);
+                playerX += sinf(playerA - 1.57) * 0.5; // pi/2 (90 degrees) = 1.57
+                playerY += cosf(playerA - 1.57) * 0.5;
 
                 // Collision detection
                 if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
                 {
                     // New position puts us inside a wall. Rollback the move we just did
-                    playerX -= sinf(playerA - 1.57);
-                    playerY -= cosf(playerA - 1.57);
+                    playerX -= sinf(playerA - 1.57) * 0.5;
+                    playerY -= cosf(playerA - 1.57) * 0.5;
                 }
             }
             else if (key == 'd') // strafe right
             {
-                playerX += sinf(playerA + 1.57);
-                playerY += cosf(playerA + 1.57);
+                playerX += sinf(playerA + 1.57) * 0.5;
+                playerY += cosf(playerA + 1.57) * 0.5;
 
                 // Collision detection
                 if (map[(int)playerY * MAP_WIDTH + (int)playerX] == '#')
                 {
                     // New position puts us inside a wall. Rollback the move we just did
-                    playerX -= sinf(playerA + 1.57);
-                    playerY -= cosf(playerA + 1.57);
+                    playerX -= sinf(playerA + 1.57) * 0.5;
+                    playerY -= cosf(playerA + 1.57) * 0.5;
                 }
             }
             else if (key == 'v') // Switch visual mode (toggle between ascii and colorized drawing)
@@ -163,6 +166,10 @@ int main(int argc,char* argv[])
                 attrset(A_NORMAL); // Override previous attributes set, and set to normal
                                    // if switching is to ascii rendering
                                    // (attron doesn,'t override previous, attrset does though)
+            }
+            else if (key == 'm') // Toggle display map
+            {
+                display_map = !display_map;
             }
         }
 
@@ -190,15 +197,16 @@ int main(int argc,char* argv[])
             bool hitWall = false;
 
             // Unit vector for ray
-            float eyeX = sinf(rayAngle);
-            float eyeY = cosf(rayAngle);
+            float rayX = sinf(rayAngle);
+            float rayY = cosf(rayAngle);
+
             while (!hitWall && distanceToWall < MAX_DEPTH)
             {
                 distanceToWall += RAYCAST_DIST_RES;
 
-                int testX = (int)(playerX + eyeX * distanceToWall);
-                int testY = (int)(playerY + eyeY * distanceToWall);
-            
+                int testX = (int)(playerX + rayX * distanceToWall);
+                int testY = (int)(playerY + rayY * distanceToWall);
+
                 // Test if ray is out of bounds
                 if ( testX < 0 ||
                      testX >= MAP_WIDTH ||
@@ -225,7 +233,8 @@ int main(int argc,char* argv[])
             // we can think the height of the wall as it appears shrinks closer and closer
             // to the middle as we move further away, so it shrinks in how it appears equally
             // from the floor as it does from the ceiling.
-            int ceiling = std::max( (float)(screen_height / 2.0) - screen_height / ((float) distanceToWall), 0.0f );
+            int ceiling = std::max( (float)(screen_height / 2.0) - (float)(MAX_DEPTH * 4) / ((float) distanceToWall), 0.0f );
+
             int floor = screen_height - ceiling;
 
             if (colored_output)
@@ -259,6 +268,21 @@ int main(int argc,char* argv[])
         prevClock = clock();
         frameCounter++;
         printw("player pos (x,y) = %.3f,%.3f playerA = %.3f", playerX, playerY, playerA);
+
+        if (display_map)
+        {
+            // Draw map
+            move(0,0); // Draw map in top left corner
+            std::string mapCopy = map;
+            mapCopy[((int)playerY) * MAP_WIDTH + ((int)playerX)] = 'P';
+            for (int y = 0; y < MAP_HEIGHT; ++y)
+            {
+                move(y,0);
+                std::string mapRow = mapCopy.substr(y*MAP_WIDTH, MAP_WIDTH);
+                printw(mapRow.c_str());
+            }
+        }
+
         refresh(); // Without this printw will not be outputted before
 
     } // End of Game loop ( while(1) )

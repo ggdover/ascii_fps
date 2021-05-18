@@ -25,10 +25,10 @@
 //   we can differ distance between two ray casts is one map tile.
 // - The smaller distance this is, the better distance rendering will look, but it will 
 //   simultaneously bring down performance slightly.
-#define RAYCAST_DIST_RES 0.05
+#define RAYCAST_DIST_RES 0.01
 
 // Max field depth. Maximum distance player can see, value has 1:1 ratio to map tile
-#define MAX_DEPTH 20
+#define MAX_DEPTH 15
 
 // The official screen width and height.
 // The values represents number of characters in width and height.

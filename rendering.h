@@ -8,6 +8,10 @@ void init_colors();
 // Draws/Renders one column of the wall with each call
 void colored_draw_wall_column(int x, int ceiling, int floor, float distanceToWall);
 
+// Secondary version of function with similar name
+// Holds more shades of gray than the other version of this function.
+void colored_draw_wall_column_2(int x, int ceiling, int floor, float distanceToWall);
+
 // Draws/Renders the colored ceiling and floor
 // ( Needs only to be called once per frame
 //   not once per column drawn.

@@ -28,7 +28,7 @@ void ascii_shade_column(int x, int ceiling, int floor, float distanceToWall, std
             // This pixel is part of the ceiling
             screen[y * screen_width + x] = ' ';
         }
-        else if (y > ceiling && y <= floor)
+        else if (y >= ceiling && y <= floor)
         {
             // Get shade based on current distance
             // 1. Get precentage of how far the distance is
@@ -126,6 +126,12 @@ void init_colors()
     assert(init_color(19, 104, 104, 121) == OK);
     assert(init_color(20,  50,  50,  59) == OK);
 
+    assert(init_color(21, 614, 614, 716) == OK);
+    assert(init_color(22, 559, 559, 653) == OK);
+    assert(init_color(23, 494, 494, 591) == OK);
+    assert(init_color(24, 453, 453, 528) == OK);
+    assert(init_color(25, 398, 398, 465) == OK);
+
     // Floor and Ceiling background colors/shades
     // (From brightest to darkest)
     assert(init_color(30, 498, 165, 98) == OK);
@@ -153,6 +159,12 @@ void init_colors()
     init_pair(18, 9, 18);
     init_pair(19, 9, 19);
     init_pair(20, 9, 20);
+
+    init_pair(21, 9, 21);
+    init_pair(22, 9, 22);
+    init_pair(23, 9, 23);
+    init_pair(24, 9, 24);
+    init_pair(25, 9, 25);
 
     // Floor/Ceiling shades
     init_pair(30, 9, 30);
@@ -242,6 +254,124 @@ void colored_draw_wall_column(int x, int ceiling, int floor, float distanceToWal
         attron(COLOR_PAIR(19));
     }
     else if (sight_distance < 0.6f)
+    {
+        attron(COLOR_PAIR(20));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(20));
+    }
+    else
+    {
+        // Make the shade for longest distance to wall the same
+        // as the longest distance/darkest shade for ceiling/floor
+        // so that the most distant wall just blends into the background.
+        attron(COLOR_PAIR(37));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(37));
+    }
+}
+
+
+// PARAMETERS:
+// x [in]          = Which column (in x-axis) that we are currently shading
+// ceiling [in]    = y-coordinate at which ceiling starts (from the wall).
+//                   Can also be seen as the lowest y-coordinate that is part of the ceiling
+// floor [in]      = y-coordinate at which floor starts (from the wall).
+//                   Can also be seen as the highest y-coordinate that is part of the floor
+// distanceToWall [in] = Distance to wall for the column determined by parameter 'x'
+void colored_draw_wall_column_2(int x, int ceiling, int floor, float distanceToWall)
+{
+    // Get shade based on current distance
+    // 1. Get precentage of how far the distance is
+    //    1.0f (100%) means that distance is MAX_DEPTH
+    //    (The max of what we can see
+    float sight_distance = distanceToWall / MAX_DEPTH;
+    int wall_length = floor - ceiling;
+
+    if (sight_distance < 0.025f)
+    {
+        attron(COLOR_PAIR(21));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(22));
+    }
+    else if (sight_distance < 0.05f)
+    {
+        attron(COLOR_PAIR(10));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(10));
+    }
+    else if (sight_distance < 0.075f)
+    {
+        attron(COLOR_PAIR(23));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(23));
+    }
+    else if (sight_distance < 0.1f)
+    {
+        attron(COLOR_PAIR(11));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(11));
+    }
+    else if (sight_distance < 0.125f)
+    {
+        attron(COLOR_PAIR(24));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(24));
+    }
+    else if (sight_distance < 0.15f)
+    {
+        attron(COLOR_PAIR(12));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(12));
+    }
+    else if (sight_distance < 0.175f)
+    {
+        attron(COLOR_PAIR(25));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(25));
+    }
+    else if (sight_distance < 0.2f)
+    {
+        attron(COLOR_PAIR(13));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(13));
+    }
+    else if (sight_distance < 0.25f)
+    {
+        attron(COLOR_PAIR(14));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(14));
+    }
+    else if (sight_distance < 0.3f)
+    {
+        attron(COLOR_PAIR(15));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(15));
+    }
+    else if (sight_distance < 0.35f)
+    {
+        attron(COLOR_PAIR(16));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(16));
+    }
+    else if (sight_distance < 0.5f)
+    {
+        attron(COLOR_PAIR(17));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(17));
+    }
+    else if (sight_distance < 0.6f)
+    {
+        attron(COLOR_PAIR(18));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(18));
+    }
+    else if (sight_distance < 0.7f)
+    {
+        attron(COLOR_PAIR(19));
+        mvvline(ceiling, x, ' ', wall_length);
+        attron(COLOR_PAIR(19));
+    }
+    else if (sight_distance < 0.8f)
     {
         attron(COLOR_PAIR(20));
         mvvline(ceiling, x, ' ', wall_length);
